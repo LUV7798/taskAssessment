@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction Viewer</title>
+  <style>
+    /* Add your CSS styles here */
+    h1{
+      font-size:xx-large;
+      font-family: 'Times New Roman', Times, serif;
+      font-style: italic;
+      color: cadetblue;
+    }
+    h2{
+      font-size:xx-large;
+      font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      font-style:italic;
+      color: red;
+    }
+    #month{
+      color:cornflowerblue;
+      font-size: 15px;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Transaction Viewer</h1>
+
+  <form id="search-form">
+    <label for="month"><strong>Select Month:</strong></label>
+    <select name="month" id="month">
+        <!-- Add options for other months -->
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3" selected>March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+      
+    </select>
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="transactions-list">
+    <!-- Transaction data will be displayed here -->
+  </div>
+
+  <h2>Statistics</h2>
+
+  <div id="statistics">
+    <!-- Statistics will be displayed here -->
+  </div>
+
+  <script>
+    // Function to fetch transaction data
+    async function fetchTransactions(month) {
+      try {
+        const response = await fetch(`/sales/${month}`);
+        const data = await response.json();
+
+        // Display transactions
+        const transactionsList = document.getElementById('transactions-list');
+        transactionsList.innerHTML = '';
+        data.forEach(transaction => {
+          const transactionElement = document.createElement('div');
+          transactionElement.innerHTML = `
+            <h3>${transaction.title}</h3>
+            <p>Description: ${transaction.description}</p>
+            <p>Price: ${transaction.price}</p>
+            <p>Date of Sale: ${transaction.dateOfSale}</p>
+            <hr>
+          `;
+          transactionsList.appendChild(transactionElement);
+        });
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      }
+    }
+
+    // Function to fetch statistics
+    async function fetchStatistics(month) {
+      try {
+        const response = await fetch(`/statistics?month=${month}`);
+        const data = await response.json();
+
+        // Display statistics
+        const statisticsDiv = document.getElementById('statistics');
+        statisticsDiv.style.color = 'green';        // Example: Changing text color to green
+        statisticsDiv.style.fontWeight = 'bold';    // Example: making text bold
+        statisticsDiv.style.fontSize ='30px'; 
+
+        statisticsDiv.innerHTML = `
+          <p>Total Sale Amount: ${data.totalSaleAmount}</p>
+          <p>Total Sold Items: ${data.totalSoldItems}</p>
+          <p>Total Not Sold Items: ${data.totalNotSoldItems}</p>
+        `;
+      } catch (error) {
+        console.error('Error fetching statistics:', error);
+      }
+    }
+
+    // Function to handle form submission
+    function handleSubmit(event) {
+      event.preventDefault();
+      const month = document.getElementById('month').value;
+      fetchTransactions(month);
+      fetchStatistics(month);
+    }
+
+    // Add event listener to form submission
+    document.getElementById('search-form').addEventListener('submit', handleSubmit);
+  </script>
+</body>
+</html>
